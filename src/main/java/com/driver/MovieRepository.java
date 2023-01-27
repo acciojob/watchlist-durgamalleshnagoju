@@ -27,9 +27,10 @@ public class MovieRepository {
 
     public String addMovieDirectorPair(String movieName, String directorName){
         if(movieDb.containsKey(movieName) && directorDb.containsKey(directorName)){
-            List<String> movieList = new ArrayList<>();
+            Director director = directorDb.get(directorName);
+            List<String> movieList = db.getOrDefault(director, new ArrayList<>());
             movieList.add(movieName);
-            db.put(directorDb.get(directorName), movieList);
+            db.put(director, movieList);
             return "success";
         }
         return "no existing movies or directors";
@@ -73,11 +74,14 @@ public class MovieRepository {
             return "No director in the Database";
         }
         Director director = directorDb.get(directorName);
-        List<String> movieList = db.get(director);
-        db.remove(director);
-        for(String movie : movieList){
-            movieDb.remove(movie);
+        if(db.containsKey(director)){
+            List<String> movieList = db.get(director);
+            db.remove(director);
+            for(String movie : movieList){
+                movieDb.remove(movie);
+            }
         }
+        directorDb.remove(directorName);
         return "Director removed from Database";
     }
 
